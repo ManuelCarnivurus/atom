@@ -1,0 +1,1097 @@
+Option Explicit
+
+    Dim m As Variant
+    Dim mensaje, mensaje2, titulo, dt, n As String
+    Dim UltimaFila As String
+    Dim BrandName, SubBrand, Platform, ContentType, OSGroup, AV1, AV2, AV3, Formulas1, Formulas2 As String
+    Dim Doble As String
+
+Sub DDDCR()
+
+' Macro para check list DCR
+' Creado por Juan Manuel Hernández Rivera
+' juanmanuel.hernandez@nielsen.com
+  
+mensaje = "Type the checklist number you want to select"
+mensaje2 = "(For Example: 116)"
+titulo = "Type the check"
+
+m = LCase(inputbox(Chr(13) + mensaje + Chr(13) & mensaje2, titulo, 116))
+    
+    If m = "" Then GoTo ending
+    
+    If IsNumeric(m) And ((Len(m) = 3 And Mid(m, 1, 1) <> 1) Or Len(m) = 4) Then
+    MsgBox ("Escalate to Production Support")
+    GoTo ending
+    End If
+    
+    
+    If m = 13 Or m = 14 Or m = 15 Or m = 16 Or m = 18 _
+    Or m = 19 Or m = 20 Or m = 21 Or m = 22 Then
+    Labels
+    GoTo DCR_13_14_15_16_18_19_20_21_22
+    End If
+    
+    If m = "38" Then
+    Labels
+    GoTo DCR_38
+    End If
+    
+    If m = 64 Then
+    Labels
+    GoTo DCR_64
+    End If
+    
+    If m = 78 Or m = 79 Then
+    Labels
+    GoTo DCR_78_79
+    End If
+    
+    If m = 90 Or m = 91 Then
+    Labels
+    GoTo DCR_90_91
+    End If
+    
+    If m = 115 Or m = 116 Then
+    Labels
+    GoTo DCR_115_116
+    End If
+    
+    If m = 121 Or m = 122 Then
+    Labels
+    GoTo DCR_121_122
+    End If
+    
+    If m = "list" Then
+    
+    GoTo DCR_List
+    Else: MsgBox ("Macro not registered yet, contact to juanmanuel.hernandez@nielsen.com")
+    GoTo ending
+    End If
+    
+DCR_13_14_15_16_18_19_20_21_22:
+
+    'Se muestran solo las columnas necesarias
+    
+    hide_columns
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    
+    'se añade formula
+    Range(BrandName & "2").Select
+    Range(Formulas1 & "2").Select
+    
+    ActiveCell.FormulaR1C1 = "=IF(OR(ISNUMBER(RC[-19])=FALSE,ISNUMBER(RC[-15])=FALSE),""Report"",IF(RC[-15]>=RC[-19],""Release"",""Report""))"
+    
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+    
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas1 & ":" & Formulas1).Select
+    
+    Call condicionales
+    
+    If m = 13 Or m = 14 Or m = 15 Or m = 16 Then GoTo version1 Else
+    GoTo version2
+    
+    '13 to 16
+version1:
+        
+            Range(Formulas1 & "1").Value = "Formula"
+            Range(AV1 & "1").Value = "Current Day SC Imprs (AV1)"
+            Range(AV2 & "1").Value = "Previous Day SC Imprs (AV2)"
+            
+            GoTo Third
+        
+    '18 to 22
+version2:
+        
+            'Se da formato a la columna
+            Range(Formulas1 & "1").Value = "Formula"
+            Range(AV1 & "1").Value = "Current Day FB Imprs (AV1)"
+            Range(AV2 & "1").Value = "Previous Day FB Imprs (AV2)"
+            
+            GoTo Third
+            
+Third:
+            
+            Columns(Formulas1 & ":" & Formulas2).AutoFit
+            
+            Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+            
+            Call formato
+            
+            Range(BrandName & "1").Select
+            
+            Call cuadricula
+            
+            Call OrderbyFormulas1
+            
+            GoTo ending
+    
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+DCR_38:
+
+    'Se muestran solo las columnas necesarias
+    
+    Call esconder
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    'se añade formula
+
+    Range(BrandName & "2").Select
+    Range(Formulas1 & "2").Select
+
+
+    ActiveCell.FormulaR1C1 = "=IF(ISNUMBER(RC[-19]),IF(RC[-19]<1000,""Report"",""Release""),""Report"")"
+    
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas1 & ":" & Formulas1).Select
+
+    
+    Call condicionales2
+    
+    'Se da formato a la columna
+        
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(AV1 & "1").Value = "SC Imprs (AV1)"
+    
+    Columns(Formulas1).AutoFit
+    
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+    
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    
+    Call OrderbyFormulas1
+    
+    GoTo ending
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+DCR_64:
+    
+    Dim box As Variant
+    mensaje = "Select the Frequency (a,b,c or d)"
+    mensaje2 = "a)Daily    b)Weekly    c)Monthly    d)QTD"
+    titulo = "Frequency check"
+    
+Start:
+    
+    box = LCase(inputbox(mensaje + Chr(13) + Chr(13) + mensaje2))
+    
+    If box = "a" Then
+    GoTo Daily
+    End If
+    
+    If box = "b" Or box = "c" Or box = "d" Then
+    GoTo Weekly
+    End If
+    
+    If box = "" Then
+    GoTo ending
+    Else: MsgBox ("Wrong option, select a letter in the list")
+    GoTo Start
+    End If
+Daily:
+    
+    'Se muestran solo las columnas necesarias
+        Call esconder
+        
+        
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(SubBrand).Hidden = False
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(AV3).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    Range(BrandName & "2").Select
+    Range(Formulas1 & "2").Select
+
+    ActiveCell.FormulaR1C1 = _
+        "=IF(OR(ISNUMBER(RC[-11])=FALSE,ISNUMBER(RC[-15])=FALSE),""Report"",IF(AND(RC[-11]>100,RC[-15]<10),""Release"",""Report""))"
+    
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas1 & ":" & Formulas1).Select
+
+    
+    Call condicionales
+    
+    'Se da formato a la columna
+    
+    
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(AV1 & "1").Value = "SC Imprs (AV1)"
+    Range(AV2 & "1").Value = "Estimated Audience UA (AV2)"
+    Range(AV3 & "1").Value = "Estimated Frequency (AV3)"
+    
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+    
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+
+    
+    Call OrderbyFormulas1
+    
+GoTo ending
+ 
+Weekly:
+    'Se muestran solo las columnas necesarias
+    Call esconder
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(SubBrand).Hidden = False
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(AV3).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    Range(BrandName & "2").Select
+    Range(Formulas1 & "2").Select
+
+    ActiveCell.FormulaR1C1 = _
+     "=IF(OR(ISNUMBER(RC[-11])=FALSE,ISNUMBER(RC[-15])=FALSE,ISNUMBER(RC[-19])=FALSE),""Report"",IF(AND(RC[-11]>100,RC[-15]>10,RC[-19]>1000),""Release"", ""Report""))"
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+    
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas1 & ":" & Formulas1).Select
+
+    Call condicionales
+    
+    'Se da formato a la columna
+    
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(AV1 & "1").Value = "Estimated Impressions (AV1)"
+    Range(AV2 & "1").Value = "Estimated Audience UA (AV2)"
+    Range(AV3 & "1").Value = "Estimated Frequency (AV3)"
+    
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+       
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+
+    Call OrderbyFormulas1
+ 
+ GoTo ending
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+DCR_78_79:
+
+    'Se muestran solo las columnas necesarias
+    Call esconder
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(SubBrand).Hidden = False
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    Range(BrandName & "2").Select
+    Range(Formulas1 & "2").Select
+    
+    ActiveCell.FormulaR1C1 = "=IF(OR(ISNUMBER(RC[-15])=FALSE,ISNUMBER(RC[-19])=FALSE),""No Data"",ABS(1-(RC[-15]/RC[-19])))"
+    Selection.Style = "Percent"
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+
+    'se añade formula AS2
+
+    Range(Formulas2 & "2").Select
+
+    ActiveCell.FormulaR1C1 = _
+       "=IF(OR(ISNUMBER(RC[-1])=FALSE),""Report"",IF(RC[-1]<=20%,""Release"",""Report""))"
+    'Se ingresa autofill de nuevo para AS2
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas2 & "2") & ":" & Formulas2 & UltimaFila)
+    
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+    
+    Columns(Formulas2).Select
+    Call condicionales
+    
+    'Se da formato a la columna
+    
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(AV1 & "1").Value = "Census Impr (AV1)"
+    Range(AV2 & "1").Value = "FB Impr (AV2)"
+    Range(Formulas2 & "1").Value = "Condition"
+    
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    
+    Call OrderbyFormulas2
+    
+GoTo ending
+    
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+DCR_90_91:
+
+    'Se muestran solo las columnas necesarias
+    Call esconder
+    
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(SubBrand).Hidden = False
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(AV3).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    Range(BrandName & "2").Select
+    Range(Formulas1 & "2").Select
+    
+    'se añade formula AR2
+
+    ActiveCell.FormulaR1C1 = "=IF(OR(ISNUMBER(RC[-11])=FALSE,ISNUMBER(RC[-19])=FALSE),""No Data"",ABS((RC[-11]-RC[-19])/RC[-19]))"
+    Selection.Style = "Percent"
+    
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+    
+    'se añade formula AS2
+
+    Range(Formulas2 & "2").Select
+   
+    ActiveCell.FormulaR1C1 = "=IF(OR(ISNUMBER(RC[-1])=FALSE),""Report"",IF(RC[-1]<=1000%,""Release"",""Report""))"
+
+    'Se ingresa autofill de nuevo para AS2
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas2 & "2") & ":" & Formulas2 & UltimaFila)
+    
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas2 & ":" & Formulas2).Select
+    
+    Call condicionales
+    
+    'Se da formato a la columna
+    
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(Formulas2 & "1").Value = "Condition"
+    Range(AV1 & "1").Value = "Census (AV1)"
+    Range(AV2 & "1").Value = "Deviation (AV2)"
+    Range(AV3 & "1").Value = "Mean (AV3)"
+    
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+    
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    
+    Call OrderbyFormulas2
+    
+    GoTo ending
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+DCR_115_116:
+
+    'Se muestran solo las columnas necesarias
+    
+    Call esconder
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    'se añade formula
+
+    Range(Formulas1 & "2").Select
+
+    ActiveCell.FormulaR1C1 = "=IF(OR(ISNUMBER(RC[-19])=FALSE,ISNUMBER(RC[-15])=FALSE),""Report"",IF(RC[-19]<RC[-15],""Release"",""Report""))"
+    
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas1 & ":" & Formulas1).Select
+    
+    Call condicionales
+    
+    'Se da formato a la columna
+    
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(AV1 & "1").Value = "FB App launches (AV1)"
+    Range(AV2 & "1").Value = "FB App UA (AV2)"
+    
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    
+    Call OrderbyFormulas1
+    
+    GoTo ending
+    
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+DCR_121_122:
+
+    'Se muestran solo las columnas necesarias
+    Call esconder
+    
+    Columns(BrandName).Hidden = False
+    Columns(BrandName).Select
+    Columns(Platform).Hidden = False
+    Columns(AV1).Hidden = False
+    Columns(AV2).Hidden = False
+    Columns(ContentType).Hidden = False
+    Columns(OSGroup).Hidden = False
+    
+    'se añade formula
+
+    Range(Formulas1 & "2").Select
+
+    ActiveCell.FormulaR1C1 = "=IF(OR(ISNUMBER(RC[-19])=FALSE,ISNUMBER(RC[-15])=FALSE),""No Data"",ABS(RC[-15]/RC[-19]))"
+    Selection.NumberFormat = "0.0"
+
+    'Se ingresa autofill para que las formulas se copien automaticamente
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    
+    On Error Resume Next
+    Selection.AutoFill Destination:=Range((Formulas1 & "2") & ":" & Formulas1 & UltimaFila)
+    
+    
+    'se añade formula AS2
+
+    Range(Formulas2 & "2").Select
+
+    ActiveCell.FormulaR1C1 = _
+         "=IF(OR(ISNUMBER(RC[-1])=FALSE),""Report"",IF(RC[-1]<=2,""Release"",""Report""))"
+        
+    'Se ingresa autofill de nuevo para AS2
+
+    UltimaFila = ActiveSheet.Cells(Rows.Count, "A").End(xlUp).Row
+    On Error Resume Next
+    Selection.AutoFill Destination:=Range((Formulas2 & "2") & ":" & Formulas2 & UltimaFila)
+    
+    'Se ingresan las condiciones para que aparezca el error en verde y rojo
+    Columns(Formulas2 & ":" & Formulas2).Select
+    
+    Call condicionales
+    
+    'Se da formato a la columna
+    
+    Range(AV1 & "1").Value = "Raw Frequency (AV1)"
+    Range(AV2 & "1").Value = "Estimated Frequency (AV2)"
+    Range(Formulas1 & "1").Value = "Formula"
+    Range(Formulas2 & "1").Value = "Condition"
+    
+    Columns(Formulas1 & ":" & Formulas2).AutoFit
+    
+    Range((Formulas1 & "1"), (Formulas2 & "1")).Select
+
+    Call formato
+    
+    Range(BrandName & "1").Select
+    
+    Call cuadricula
+    
+    Call OrderbyFormulas2
+    
+    GoTo ending
+    
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+DCR_List:
+
+    On Error GoTo step2
+    If Sheets("Results").Select = True Then
+    Application.DisplayAlerts = False
+    Sheets("Results").Delete
+    Application.DisplayAlerts = True
+    End If
+
+
+step2:
+    Sheets("Entity Management").Select
+    Columns("I:I").Select
+    Selection.Copy
+    Sheets.Add After:=Sheets(Sheets.Count)
+    Columns("A:A").Select
+    ActiveSheet.Paste
+
+
+    ActiveSheet.Name = "Results"
+
+    Columns("A:A").Select
+    Application.CutCopyMode = False
+    'ActiveSheet.Range("A:A").RemoveDuplicates Columns:=1, Header:=xlYes
+    Selection.TextToColumns Destination:=Range("A1"), DataType:=xlDelimited, _
+        TextQualifier:=xlDoubleQuote, ConsecutiveDelimiter:=False, Tab:=True, _
+        Semicolon:=False, Comma:=True, Space:=False, Other:=False, FieldInfo _
+        :=Array(Array(1, 1), Array(2, 1), Array(3, 1), Array(4, 1)), TrailingMinusNumbers:= _
+        True
+    
+    ActiveSheet.Range("A:A").RemoveDuplicates Columns:=1, Header:=xlYes
+    ActiveSheet.Range("B:B").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("C:C").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("D:D").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("E:E").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("F:F").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("G:G").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("H:H").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("I:I").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("J:J").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("K:K").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("L:L").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("M:M").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("N:N").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("O:O").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("P:P").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("Q:Q").RemoveDuplicates Columns:=1, Header:=xlNo
+    ActiveSheet.Range("R:R").RemoveDuplicates Columns:=1, Header:=xlNo
+    ' Incluyo la formula para copiar las columnas en la primer columna
+
+    Range("b1:b" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("c1:c" & Range("c65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("d1:d" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("e1:e" & Range("c65000").End(xlUp).Row).Copy
+     Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("f1:f" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("g1:g" & Range("c65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("h1:h" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("I1:I" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("J1:J" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("K1:K" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("L1:L" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("M1:M" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("N1:N" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("O1:O" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("P1:P" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("Q1:Q" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+    Range("R1:R" & Range("b65000").End(xlUp).Row).Copy
+        Range("a65000").End(xlUp).Offset(1, 0).PasteSpecial xlPasteValues
+
+    ' Se borran las columnas que ya fueron copiadas
+    Columns("B:R").Select
+    Selection.Delete Shift:=xlToLeft
+    
+    ' Esta formula filtra y deja en orden para su análisis
+
+    Range("A1").Select
+    Selection.AutoFilter
+    Columns("A:A").Select
+    ActiveSheet.Range("A:A").RemoveDuplicates Columns:=1, Header:=xlYes
+    Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+    Range("A1").Select
+    Selection.AutoFilter
+    Columns("A:A").Select
+    ActiveSheet.Range("A:A").RemoveDuplicates Columns:=1, Header:=xlYes
+    ActiveSheet.Sort.SortFields.Clear
+    ActiveSheet.Sort.SortFields.Add Key:=Range _
+        ("A1:A3"), SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:= _
+        xlSortNormal
+    With ActiveSheet.Sort
+    .SetRange Range("A:A")
+    .Header = xlYes
+    .MatchCase = False
+    .Orientation = xlTopToBottom
+    .SortMethod = xlPinYin
+    .Apply
+End With
+
+'''''''''''''''''''''''''''''''''''''''''''
+    Dim v As String
+    Range("a2").Select
+    
+Bucle:
+    
+    If ActiveCell <> "" Then
+    GoTo Formulario
+    Else: GoTo nextstep
+    End If
+    
+Formulario:
+    
+    v = ActiveCell.Value
+    
+    If v = 24 Or v = 25 Or v = 30 Or v = 31 Or v = 47 Or v = 131 Or v = 132 Or v = 134 Or v = 135 Or v = 136 Or v = 137 Or v = 160 Or v = 161 Then
+    ActiveCell.Offset(0, 1) = "Release"
+    End If
+    
+    If v = 33 Or v = 34 Or v = 35 Or v = 36 Or v = 44 Or v = 133 Then
+    ActiveCell.Offset(0, 1) = "Report"
+    End If
+    
+    If v = 17 Or v = 37 Or v = 40 Or v = 45 Or v = 46 Or v = 48 Or v = 50 Or v = 70 Or v = 74 Or v = 32 Then
+    ActiveCell.Offset(0, 1) = "Manual"
+    End If
+    
+    If v = 13 Or v = 14 Or v = 15 Or v = 16 Or v = 18 Or v = 19 Or v = 20 Or v = 21 Or v = 22 Or v = 23 _
+    Or v = 38 Or v = 39 Or v = 41 Or v = 42 Or v = 43 Or v = 64 _
+    Or v = 73 Or v = 75 Or v = 76 Or v = 77 Or v = 98 Or v = 99 Or v = 101 Or v = 102 _
+    Or v = 78 Or v = 79 Or v = 90 Or v = 91 Or v = 115 Or v = 116 Or v = 121 Or v = 122 Then
+    ActiveCell.Offset(0, 1) = "Formula"
+    End If
+    
+    If v = 1001 Or v = 1002 Or v = 1003 Or v = 1004 Or v = 1007 Or v = 1008 Or v = 1108 Or v = 1109 _
+    Or v = 1110 Or v = 1111 Or v = 1112 Or v = 1116 Or v = 1117 Or v = 1118 Or v = 1119 Or v = 1120 _
+    Or v = 1121 Or v = 1125 Or v = 1126 Or v = 1127 Or v = 1128 Or v = 1129 Or v = 1130 Or v = 1131 _
+    Or v = 1133 Or v = 1134 Or v = 1135 Or v = 1149 Or v = 1150 Or v = 1151 Or v = 1152 Or v = 1191 _
+    Or v = 1194 Or v = 2000 Or v = 2001 Or v = 2002 Or v = 2003 Or v = 2004 Or v = 2005 Or v = 2006 _
+    Or v = 2007 Or v = 2008 Or v = 2009 Or v = 2010 Or v = 2011 Or v = 2012 Or v = 2013 Or v = 2014 _
+    Or v = 2015 Or v = 2016 Or v = 2017 Or v = 3001 Or v = 3003 Or v = 3004 Or v = 3005 Or v = 3006 _
+    Or v = 4003 Or v = 4007 Or v = 4008 Or v = 4009 Or v = 4010 Then
+    ActiveCell.Offset(0, 1) = "Report"
+    End If
+    
+    If v = 501 Or v = 502 Or v = 503 Or v = 504 Or v = 505 Or v = 506 Or v = 507 Or v = 508 Or v = 509 _
+    Or v = 510 Or v = 511 Or v = 512 Or v = 513 Or v = 514 Or v = 515 Or v = 519 Or v = 520 Or v = 521 _
+    Or v = 522 Or v = 523 Or v = 524 Or v = 525 Or v = 526 Or v = 527 Or v = 528 Or v = 529 Or v = 530 _
+    Or v = 531 Or v = 532 Or v = 533 Or v = 534 Or v = 535 Or v = 536 Or v = 537 Or v = 538 Or v = 539 _
+    Or v = 540 Or v = 541 Or v = 542 Or v = 543 Or v = 544 Or v = 545 Or v = 546 Or v = 548 Or v = 549 _
+    Or v = 550 Then
+    ActiveCell.Offset(0, 1) = "Report"
+    End If
+    
+    Selection.Offset(1).Select
+    GoTo Bucle
+
+nextstep:
+
+    Call Condicionales3
+    '''''''''''''''''''''
+    GoTo ending
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+ending:
+
+ MsgBox ("Done")
+ 
+End Sub
+Private Sub Labels()
+   'BrandName
+
+    Rows("1:1").Select
+    Selection.Find(What:="Brand Name", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+        
+    'BrandN = ActiveCell.Address
+    
+    BrandName = Split(ActiveCell.Address, "$")(1)
+   
+    'Subrand
+        
+     Rows("1:1").Select
+    Selection.Find(What:="Sub Brand Name", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+            
+    SubBrand = Split(ActiveCell.Address, "$")(1)
+    
+    'Platform
+        
+     Rows("1:1").Select
+    Selection.Find(What:="Platform", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+         
+     Platform = Split(ActiveCell.Address, "$")(1)
+       
+    
+    'ContentType
+        
+     Rows("1:1").Select
+    Selection.Find(What:="Content Type", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+        
+    ContentType = Split(ActiveCell.Address, "$")(1)
+    'OSGroup
+        
+     Rows("1:1").Select
+    Selection.Find(What:="OS Group", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+          
+     OSGroup = Split(ActiveCell.Address, "$")(1)
+    
+    'AV1
+        
+     Rows("1:1").Select
+    Selection.Find(What:="Actual Value 1", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+        
+    AV1 = Split(ActiveCell.Address, "$")(1)
+
+    'AV2
+        
+     Rows("1:1").Select
+    Selection.Find(What:="Actual Value 2", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+        
+    AV2 = Split(ActiveCell.Address, "$")(1)
+    
+    'AV3
+        
+     Rows("1:1").Select
+    Selection.Find(What:="Actual Value 3", After:=ActiveCell, LookIn:=xlFormulas _
+        , LookAt:=xlPart, SearchOrder:=xlByRows, SearchDirection:=xlNext, _
+        MatchCase:=False, SearchFormat:=False).Activate
+        
+    AV3 = Split(ActiveCell.Address, "$")(1)
+    
+    'Formulas1
+        
+    Range("A1").Select
+    Selection.End(xlToRight).Select
+    ActiveCell.Offset(0, 1).Select
+    Formulas1 = Split(ActiveCell.Address, "$")(1)
+    
+    'Formulas2
+        
+    Range("A1").Select
+    Selection.End(xlToRight).Select
+    ActiveCell.Offset(0, 2).Select
+    Formulas2 = Split(ActiveCell.Address, "$")(1)
+    
+    End Sub
+    
+Private Sub hide_columns()
+
+    ActiveSheet.Cells.Select
+    Cells.FormatConditions.Delete
+    Cells.Borders.LineStyle = xlNone
+    Columns.AutoFit
+    Range("A1").Select
+    Range(Selection, Selection.End(xlToRight)).Select
+    Selection.EntireColumn.Hidden = True
+    
+End Sub
+
+
+Private Sub condicionales()
+
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+            Formula1:="=""Release"""
+        Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+        With Selection.FormatConditions(1).Font
+            .Color = -16752384
+            .TintAndShade = 0
+        End With
+        With Selection.FormatConditions(1).Interior
+            .PatternColorIndex = xlAutomatic
+            .Color = 13561798
+            .TintAndShade = 0
+        End With
+        Selection.FormatConditions(1).StopIfTrue = False
+        Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+            Formula1:="=""Report"""
+        Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+        With Selection.FormatConditions(1).Font
+            .Color = -16383844
+            .TintAndShade = 0
+        End With
+        With Selection.FormatConditions(1).Interior
+            .PatternColorIndex = xlAutomatic
+            .Color = 13551615
+            .TintAndShade = 0
+        End With
+        Selection.FormatConditions(1).StopIfTrue = False
+    
+End Sub
+
+Private Sub formato()
+
+    With Selection.Characters.Font
+            .Name = "Arial"
+            .FontStyle = "Negrita"
+        End With
+        With Selection
+            .HorizontalAlignment = xlCenter
+            .VerticalAlignment = xlCenter
+                End With
+                
+        Selection.Columns.AutoFit
+
+End Sub
+
+
+Private Sub cuadricula()
+    Range(Selection, Selection.End(xlToRight)).Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    With Selection.Borders(xlEdgeLeft)
+        .LineStyle = xlContinuous
+    End With
+    With Selection.Borders(xlEdgeTop)
+        .LineStyle = xlContinuous
+    End With
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+    End With
+    With Selection.Borders(xlInsideVertical)
+        .LineStyle = xlContinuous
+    End With
+    With Selection.Borders(xlInsideHorizontal)
+        .LineStyle = xlContinuous
+    End With
+
+
+End Sub
+
+
+
+Private Sub condicionales2()
+
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+            Formula1:="=""Release"""
+        Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+        With Selection.FormatConditions(1).Font
+            .Color = -16752384
+            .TintAndShade = 0
+        End With
+        With Selection.FormatConditions(1).Interior
+            .PatternColorIndex = xlAutomatic
+            .Color = 13561798
+            .TintAndShade = 0
+        End With
+        Selection.FormatConditions(1).StopIfTrue = False
+        Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+            Formula1:="=""Report"""
+        Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+        With Selection.FormatConditions(1).Font
+            .Color = -16383844
+            .TintAndShade = 0
+        End With
+        With Selection.FormatConditions(1).Interior
+            .PatternColorIndex = xlAutomatic
+            .Color = 13551615
+            .TintAndShade = 0
+        End With
+        Selection.FormatConditions(1).StopIfTrue = False
+
+End Sub
+
+
+Private Sub Condicionales3()
+
+    'Se agrega formato
+    Columns("B:B").Select
+    
+    'Release Series
+    
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=""Release"""
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16752384
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13561798
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+    
+    'Formula Series
+    
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=""Formula"""
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16751204
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 10284031
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+   
+   'Manual Series
+   
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=""Manual"""
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .ThemeColor = xlThemeColorLight2
+        .TintAndShade = -0.499984740745262
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .ThemeColor = xlThemeColorAccent5
+        .TintAndShade = 0.399945066682943
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+
+    'Report Series
+    
+    Selection.FormatConditions.Add Type:=xlCellValue, Operator:=xlEqual, _
+        Formula1:="=""Report"""
+    Selection.FormatConditions(Selection.FormatConditions.Count).SetFirstPriority
+    With Selection.FormatConditions(1).Font
+        .Color = -16383844
+        .TintAndShade = 0
+    End With
+    With Selection.FormatConditions(1).Interior
+        .PatternColorIndex = xlAutomatic
+        .Color = 13551615
+        .TintAndShade = 0
+    End With
+    Selection.FormatConditions(1).StopIfTrue = False
+
+End Sub
+
+Private Sub OrderbyFormulas1()
+
+'Cuando la condicional se encuentra en AS
+    Rows("1:1").Select
+    Selection.AutoFilter
+    ActiveSheet.AutoFilter.Sort.SortFields.Clear
+    ActiveSheet.AutoFilter.Sort.SortFields.Add Key _
+        :=Range(Formulas1 & "1"), SortOn:=xlSortOnValues, Order:=xlDescending, DataOption _
+        :=xlSortNormal
+    With ActiveSheet.AutoFilter.Sort
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    Selection.AutoFilter
+    Range(BrandName & "1").Select
+    
+End Sub
+
+Private Sub OrderbyFormulas2()
+
+'Cuando la condicional se encuentra en AS
+    Rows("1:1").Select
+    Selection.AutoFilter
+    ActiveSheet.AutoFilter.Sort.SortFields.Clear
+    ActiveSheet.AutoFilter.Sort.SortFields.Add Key _
+        :=Range(Formulas2 & "1"), SortOn:=xlSortOnValues, Order:=xlDescending, DataOption _
+        :=xlSortNormal
+    With ActiveSheet.AutoFilter.Sort
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+    Selection.AutoFilter
+    Range(BrandName & "1").Select
+End Sub
+
+Private Sub esconder()
+
+    ActiveSheet.Cells.Select
+    Cells.FormatConditions.Delete
+    Cells.Borders.LineStyle = xlNone
+    Columns.AutoFit
+    Range("A1").Select
+    Range(Selection, Selection.End(xlToRight)).Select
+    Selection.EntireColumn.Hidden = True
+    
+    
+End Sub
